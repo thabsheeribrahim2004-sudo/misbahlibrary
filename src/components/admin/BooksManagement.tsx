@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Edit, Trash2, BookOpen } from "lucide-react";
+import { Plus, Edit, Trash2, BookOpen, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -45,6 +45,9 @@ const BooksManagement = ({ onStatsUpdate }: BooksManagementProps) => {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingBook, setEditingBook] = useState<Book | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string>("");
   const [formData, setFormData] = useState({
     title: "",
     author: "",
@@ -91,17 +94,64 @@ const BooksManagement = ({ onStatsUpdate }: BooksManagementProps) => {
       photo_url: "",
     });
     setEditingBook(null);
+    setPhotoFile(null);
+    setPhotoPreview("");
+  };
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Image size should be less than 5MB");
+        return;
+      }
+      setPhotoFile(file);
+      setPhotoPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const uploadPhoto = async (): Promise<string | null> => {
+    if (!photoFile) return formData.photo_url || null;
+
+    try {
+      setUploading(true);
+      const fileExt = photoFile.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('book-photos')
+        .upload(filePath, photoFile);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('book-photos')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error: any) {
+      toast.error("Failed to upload photo: " + error.message);
+      return null;
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
+      const photoUrl = await uploadPhoto();
+      if (photoFile && !photoUrl) {
+        return; // Upload failed
+      }
+
       const validatedData = bookSchema.parse({
         ...formData,
         year_published: formData.year_published ? parseInt(formData.year_published) : undefined,
         total_count: parseInt(formData.total_count),
-        photo_url: formData.photo_url || undefined,
+        photo_url: photoUrl || formData.photo_url || undefined,
       });
 
       if (editingBook) {
@@ -119,6 +169,7 @@ const BooksManagement = ({ onStatsUpdate }: BooksManagementProps) => {
             title: validatedData.title,
             author: validatedData.author,
             category: validatedData.category,
+            description: formData.description || null,
             isbn: validatedData.isbn,
             publisher: validatedData.publisher,
             year_published: validatedData.year_published,
@@ -156,6 +207,8 @@ const BooksManagement = ({ onStatsUpdate }: BooksManagementProps) => {
       total_count: book.total_count.toString(),
       photo_url: book.photo_url || "",
     });
+    setPhotoPreview(book.photo_url || "");
+    setPhotoFile(null);
     setDialogOpen(true);
   };
 
@@ -239,6 +292,53 @@ const BooksManagement = ({ onStatsUpdate }: BooksManagementProps) => {
                     rows={3}
                   />
                 </div>
+                <div className="space-y-2 col-span-2">
+                  <Label>Book Photo</Label>
+                  <div className="space-y-3">
+                    {photoPreview && (
+                      <div className="relative inline-block">
+                        <img
+                          src={photoPreview}
+                          alt="Book preview"
+                          className="w-32 h-40 object-cover rounded-lg border"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute -top-2 -right-2 h-6 w-6"
+                          onClick={() => {
+                            setPhotoFile(null);
+                            setPhotoPreview("");
+                            setFormData({ ...formData, photo_url: "" });
+                          }}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <Input
+                        id="photo"
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoChange}
+                        className="hidden"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => document.getElementById('photo')?.click()}
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        Choose Photo
+                      </Button>
+                      <span className="text-sm text-muted-foreground">
+                        {photoFile ? photoFile.name : "No file chosen"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="isbn">ISBN</Label>
                   <Input
@@ -276,22 +376,23 @@ const BooksManagement = ({ onStatsUpdate }: BooksManagementProps) => {
                   />
                 </div>
                 <div className="space-y-2 col-span-2">
-                  <Label htmlFor="photo">Photo URL</Label>
+                  <Label htmlFor="photo_url">Photo URL (optional)</Label>
                   <Input
-                    id="photo"
+                    id="photo_url"
                     type="url"
                     placeholder="https://example.com/book-cover.jpg"
                     value={formData.photo_url}
                     onChange={(e) => setFormData({ ...formData, photo_url: e.target.value })}
                   />
+                  <p className="text-xs text-muted-foreground">Or upload a photo above</p>
                 </div>
               </div>
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
                   Cancel
                 </Button>
-                <Button type="submit">
-                  {editingBook ? "Update Book" : "Add Book"}
+                <Button type="submit" disabled={uploading}>
+                  {uploading ? "Uploading..." : editingBook ? "Update Book" : "Add Book"}
                 </Button>
               </DialogFooter>
             </form>
