@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -46,12 +46,11 @@ const Auth = () => {
   });
 
   // Redirect if already authenticated
-  if (user && userRole) {
-    setTimeout(() => {
+  useEffect(() => {
+    if (user && userRole) {
       navigate(userRole === "admin" ? "/admin" : "/student");
-    }, 0);
-    return null;
-  }
+    }
+  }, [user, userRole, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
