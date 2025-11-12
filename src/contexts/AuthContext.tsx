@@ -30,13 +30,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       .from("user_roles")
       .select("role")
       .eq("user_id", userId)
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error("Error fetching user role:", error);
       return null;
     }
-    return data?.role as UserRole;
+    
+    // If no role exists, create a default student role
+    if (!data) {
+      const { error: insertError } = await supabase
+        .from("user_roles")
+        .insert({ user_id: userId, role: "student" });
+      
+      if (insertError) {
+        console.error("Error creating default role:", insertError);
+        return null;
+      }
+      return "student";
+    }
+    
+    return data.role as UserRole;
   };
 
   useEffect(() => {
