@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Plus, Edit, Trash2, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -13,6 +14,7 @@ const bookSchema = z.object({
   title: z.string().min(1, "Title is required").max(200),
   author: z.string().min(1, "Author is required").max(200),
   category: z.string().min(1, "Category is required").max(100),
+  description: z.string().max(1000).optional(),
   isbn: z.string().max(20).optional(),
   publisher: z.string().max(200).optional(),
   year_published: z.number().min(1000).max(9999).optional(),
@@ -25,6 +27,7 @@ interface Book {
   title: string;
   author: string;
   category: string;
+  description?: string;
   isbn?: string;
   photo_url?: string;
   publisher?: string;
@@ -46,6 +49,7 @@ const BooksManagement = ({ onStatsUpdate }: BooksManagementProps) => {
     title: "",
     author: "",
     category: "",
+    description: "",
     isbn: "",
     publisher: "",
     year_published: "",
@@ -79,6 +83,7 @@ const BooksManagement = ({ onStatsUpdate }: BooksManagementProps) => {
       title: "",
       author: "",
       category: "",
+      description: "",
       isbn: "",
       publisher: "",
       year_published: "",
@@ -144,6 +149,7 @@ const BooksManagement = ({ onStatsUpdate }: BooksManagementProps) => {
       title: book.title,
       author: book.author,
       category: book.category,
+      description: book.description || "",
       isbn: book.isbn || "",
       publisher: book.publisher || "",
       year_published: book.year_published?.toString() || "",
@@ -214,13 +220,23 @@ const BooksManagement = ({ onStatsUpdate }: BooksManagementProps) => {
                     required
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 col-span-2">
                   <Label htmlFor="category">Category *</Label>
                   <Input
                     id="category"
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     required
+                  />
+                </div>
+                <div className="space-y-2 col-span-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    placeholder="Brief description of the book..."
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    rows={3}
                   />
                 </div>
                 <div className="space-y-2">

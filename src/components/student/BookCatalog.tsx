@@ -12,6 +12,7 @@ interface Book {
   title: string;
   author: string;
   category: string;
+  description?: string;
   isbn?: string;
   photo_url?: string;
   publisher?: string;
@@ -112,6 +113,11 @@ const BookCatalog = ({ searchQuery }: BookCatalogProps) => {
             </div>
           </CardHeader>
           <CardContent className="flex-1">
+            {book.description && (
+              <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+                {book.description}
+              </p>
+            )}
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Category</span>

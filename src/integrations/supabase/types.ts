@@ -20,6 +20,7 @@ export type Database = {
           available_count: number
           category: string
           created_at: string
+          description: string | null
           id: string
           isbn: string | null
           photo_url: string | null
@@ -34,6 +35,7 @@ export type Database = {
           available_count?: number
           category: string
           created_at?: string
+          description?: string | null
           id?: string
           isbn?: string | null
           photo_url?: string | null
@@ -48,6 +50,7 @@ export type Database = {
           available_count?: number
           category?: string
           created_at?: string
+          description?: string | null
           id?: string
           isbn?: string | null
           photo_url?: string | null
