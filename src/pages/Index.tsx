@@ -36,14 +36,17 @@ const Index = () => {
         <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
           A modern digital solution for Misbah College Library. Track books, manage borrowings, and streamline library operations.
         </p>
-        <div className="flex gap-4 justify-center">
-          <Button size="lg" onClick={() => navigate("/auth")}>
-            Get Started
-          </Button>
-          <Button size="lg" variant="outline" onClick={() => navigate("/auth")}>
-            Sign In
-          </Button>
-        </div>
+          <div className="flex gap-4 justify-center">
+            <Button size="lg" onClick={() => navigate("/auth")}>
+              Get Started
+            </Button>
+            <Button size="lg" variant="outline" onClick={() => navigate("/auth")}>
+              Sign In
+            </Button>
+            <Button size="lg" variant="outline" onClick={() => navigate("/upload")}>
+              Upload Book
+            </Button>
+          </div>
       </header>
 
       {/* Features Section */}
