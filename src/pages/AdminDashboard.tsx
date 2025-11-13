@@ -4,9 +4,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, LogOut, Users, BookMarked, Clock } from "lucide-react";
+import { BookOpen, Users, BookMarked, Clock } from "lucide-react";
 import BooksManagement from "@/components/admin/BooksManagement";
 import BorrowRequests from "@/components/admin/BorrowRequests";
+import ProfileMenu from "@/components/ProfileMenu";
 
 const AdminDashboard = () => {
   const { user, userRole, signOut, loading } = useAuth();
@@ -51,10 +52,7 @@ const AdminDashboard = () => {
               <p className="text-sm text-muted-foreground">Admin Dashboard</p>
             </div>
           </div>
-          <Button variant="outline" onClick={signOut}>
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign Out
-          </Button>
+          <ProfileMenu />
         </div>
       </header>
 

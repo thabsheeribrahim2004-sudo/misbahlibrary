@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, LogOut, Search } from "lucide-react";
+import { BookOpen, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import BookCatalog from "@/components/student/BookCatalog";
 import MyBorrowings from "@/components/student/MyBorrowings";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ProfileMenu from "@/components/ProfileMenu";
 
 const StudentDashboard = () => {
   const { user, userRole, signOut, loading } = useAuth();
@@ -47,10 +48,7 @@ const StudentDashboard = () => {
               <p className="text-sm text-muted-foreground">Student Portal</p>
             </div>
           </div>
-          <Button variant="outline" onClick={signOut}>
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign Out
-          </Button>
+          <ProfileMenu />
         </div>
       </header>
 
