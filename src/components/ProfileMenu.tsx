@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { User, LogOut, Upload, Users as UsersIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -17,6 +18,17 @@ export default function ProfileMenu() {
   const { user, userRole, signOut } = useAuth();
   const [userName, setUserName] = useState<string>("");
   const navigate = useNavigate();
+
+  const handleBootstrapAdmin = async () => {
+    try {
+      const { error } = await supabase.functions.invoke("bootstrap-admin", { method: "POST" });
+      if (error) throw error;
+      toast.success("Admin access granted. Reloading...");
+      setTimeout(() => window.location.reload(), 800);
+    } catch (e: any) {
+      toast.error(e?.message || "Failed to become admin");
+    }
+  };
 
   useEffect(() => {
     const fetchUserName = async () => {
@@ -65,6 +77,16 @@ export default function ProfileMenu() {
             <DropdownMenuItem onClick={() => navigate("/admin/users")}>
               <UsersIcon className="h-4 w-4 mr-2" />
               Manage Users
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
+
+        {userRole !== "admin" && (
+          <>
+            <DropdownMenuItem onClick={handleBootstrapAdmin}>
+              <UsersIcon className="h-4 w-4 mr-2" />
+              Become Admin (first-time)
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>
