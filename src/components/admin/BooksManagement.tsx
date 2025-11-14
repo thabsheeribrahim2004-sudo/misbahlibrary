@@ -37,7 +37,7 @@ interface Book {
 }
 
 interface BooksManagementProps {
-  onStatsUpdate: (totalBooks: number) => void;
+  onStatsUpdate: (totalBooks: number, availableBooks: number) => void;
 }
 
 const BooksManagement = ({ onStatsUpdate }: BooksManagementProps) => {
@@ -73,7 +73,11 @@ const BooksManagement = ({ onStatsUpdate }: BooksManagementProps) => {
 
       if (error) throw error;
       setBooks(data || []);
-      onStatsUpdate(data?.length || 0);
+      
+      const totalBooks = data?.length || 0;
+      const availableBooks = data?.reduce((sum, book) => sum + (book.available_count || 0), 0) || 0;
+      
+      onStatsUpdate(totalBooks, availableBooks);
     } catch (error: any) {
       toast.error("Error loading books: " + error.message);
     } finally {

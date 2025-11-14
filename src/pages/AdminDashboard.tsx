@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,9 +15,10 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalBooks: 0,
+    availableBooks: 0,
     totalStudents: 0,
     pendingRequests: 0,
-    activeLoans: 0,
+    activeBooks: 0,
   });
 
   useEffect(() => {
@@ -24,6 +26,26 @@ const AdminDashboard = () => {
       navigate("/auth");
     }
   }, [user, userRole, loading, navigate]);
+
+  useEffect(() => {
+    if (user && userRole === "admin") {
+      fetchTotalStudents();
+    }
+  }, [user, userRole]);
+
+  const fetchTotalStudents = async () => {
+    try {
+      const { count, error } = await supabase
+        .from("user_roles")
+        .select("*", { count: "exact", head: true })
+        .eq("role", "student");
+
+      if (error) throw error;
+      setStats((prev) => ({ ...prev, totalStudents: count || 0 }));
+    } catch (error: any) {
+      console.error("Error fetching student count:", error);
+    }
+  };
 
   if (loading) {
     return (
@@ -70,6 +92,16 @@ const AdminDashboard = () => {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Available Books</CardTitle>
+              <BookOpen className="h-4 w-4 text-success" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.availableBooks}</div>
+              <p className="text-xs text-muted-foreground mt-1">Not borrowed</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Students</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
@@ -88,11 +120,12 @@ const AdminDashboard = () => {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Loans</CardTitle>
-              <BookOpen className="h-4 w-4 text-success" />
+              <CardTitle className="text-sm font-medium">Active Books</CardTitle>
+              <BookMarked className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.activeLoans}</div>
+              <div className="text-2xl font-bold">{stats.activeBooks}</div>
+              <p className="text-xs text-muted-foreground mt-1">Currently borrowed</p>
             </CardContent>
           </Card>
         </div>
@@ -104,12 +137,16 @@ const AdminDashboard = () => {
             <TabsTrigger value="requests">Borrow Requests</TabsTrigger>
           </TabsList>
           <TabsContent value="books" className="space-y-4">
-            <BooksManagement onStatsUpdate={(total) => setStats({ ...stats, totalBooks: total })} />
+            <BooksManagement 
+              onStatsUpdate={(total, available) => 
+                setStats((prev) => ({ ...prev, totalBooks: total, availableBooks: available }))
+              } 
+            />
           </TabsContent>
           <TabsContent value="requests" className="space-y-4">
             <BorrowRequests
               onStatsUpdate={(pending, active) =>
-                setStats({ ...stats, pendingRequests: pending, activeLoans: active })
+                setStats((prev) => ({ ...prev, pendingRequests: pending, activeBooks: active }))
               }
             />
           </TabsContent>
