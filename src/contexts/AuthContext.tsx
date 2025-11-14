@@ -26,31 +26,47 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
 
   const fetchUserRole = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .maybeSingle();
+    try {
+      // Prefer admin if present
+      const { data: adminData, error: adminError } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "admin")
+        .maybeSingle();
 
-    if (error) {
-      console.error("Error fetching user role:", error);
-      return null;
-    }
-    
-    // If no role exists, create a default student role
-    if (!data) {
+      if (adminError) {
+        console.error("Error checking admin role:", adminError);
+      }
+      if (adminData?.role === "admin") return "admin" as UserRole;
+
+      // Fallback to student if present
+      const { data: studentData, error: studentError } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "student")
+        .maybeSingle();
+
+      if (studentError) {
+        console.error("Error checking student role:", studentError);
+      }
+      if (studentData?.role === "student") return "student" as UserRole;
+
+      // If no role exists, create a default student role
       const { error: insertError } = await supabase
         .from("user_roles")
         .insert({ user_id: userId, role: "student" });
-      
+
       if (insertError) {
         console.error("Error creating default role:", insertError);
         return null;
       }
-      return "student";
+      return "student" as UserRole;
+    } catch (e) {
+      console.error("Unexpected error fetching role:", e);
+      return null;
     }
-    
-    return data.role as UserRole;
   };
 
   useEffect(() => {
