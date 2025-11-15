@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Edit, Trash2, BookOpen, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -279,12 +280,24 @@ const BooksManagement = ({ onStatsUpdate }: BooksManagementProps) => {
                 </div>
                 <div className="space-y-2 col-span-2">
                   <Label htmlFor="category">Category *</Label>
-                  <Input
-                    id="category"
+                  <Select
                     value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    onValueChange={(value) => setFormData({ ...formData, category: value })}
                     required
-                  />
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Novel">Novel</SelectItem>
+                      <SelectItem value="Autobiography">Autobiography</SelectItem>
+                      <SelectItem value="Study">Study</SelectItem>
+                      <SelectItem value="History">History</SelectItem>
+                      <SelectItem value="Reference">Reference</SelectItem>
+                      <SelectItem value="Fiction">Fiction</SelectItem>
+                      <SelectItem value="Non-Fiction">Non-Fiction</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2 col-span-2">
                   <Label htmlFor="description">Description</Label>

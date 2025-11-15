@@ -92,7 +92,7 @@ const BookCatalog = ({ searchQuery }: BookCatalogProps) => {
     return matchesSearch && matchesCategory;
   });
 
-  const categories = ["all", "novel", "autobiography", "study", "reference", "fiction", "non-fiction"];
+  const categories = ["all", "novel", "autobiography", "study", "history", "reference", "fiction", "non-fiction"];
   const booksByCategory = categories.reduce((acc, cat) => {
     if (cat === "all") {
       acc[cat] = books;
@@ -182,6 +182,7 @@ const BookCatalog = ({ searchQuery }: BookCatalogProps) => {
         <TabsTrigger value="novel">Novel</TabsTrigger>
         <TabsTrigger value="autobiography">Autobiography</TabsTrigger>
         <TabsTrigger value="study">Study</TabsTrigger>
+        <TabsTrigger value="history">History</TabsTrigger>
         <TabsTrigger value="reference">Reference</TabsTrigger>
         <TabsTrigger value="fiction">Fiction</TabsTrigger>
         <TabsTrigger value="non-fiction">Non-Fiction</TabsTrigger>
