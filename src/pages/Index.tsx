@@ -43,9 +43,6 @@ const Index = () => {
             <Button size="lg" variant="outline" onClick={() => navigate("/auth")}>
               Sign In
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate("/upload")}>
-              Upload Book
-            </Button>
           </div>
       </header>
 
