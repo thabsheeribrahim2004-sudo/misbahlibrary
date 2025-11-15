@@ -344,7 +344,7 @@ const BooksManagement = ({ onStatsUpdate }: BooksManagementProps) => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="isbn">ISBN</Label>
+                  <Label htmlFor="isbn">Book No</Label>
                   <Input
                     id="isbn"
                     value={formData.isbn}
@@ -440,7 +440,7 @@ const BooksManagement = ({ onStatsUpdate }: BooksManagementProps) => {
                 </div>
                 {book.isbn && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">ISBN:</span>
+                    <span className="text-muted-foreground">Book No:</span>
                     <span className="font-medium">{book.isbn}</span>
                   </div>
                 )}
