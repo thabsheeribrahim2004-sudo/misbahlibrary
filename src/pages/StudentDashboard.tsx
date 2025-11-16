@@ -39,13 +39,13 @@ const StudentDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
       {/* Header */}
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <BookOpen className="h-8 w-8 text-primary" />
+      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-10 animate-fade-in">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-3 transition-transform hover:scale-105">
+            <BookOpen className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
             <div>
-              <h1 className="text-2xl font-bold">Misbah Library</h1>
-              <p className="text-sm text-muted-foreground">Student Portal</p>
+              <h1 className="text-xl sm:text-2xl font-bold">Misbah Library</h1>
+              <p className="text-xs sm:text-sm text-muted-foreground">Student Portal</p>
             </div>
           </div>
           <ProfileMenu />
@@ -54,24 +54,25 @@ const StudentDashboard = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="catalog" className="space-y-6">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
-            <TabsTrigger value="catalog">Browse Books</TabsTrigger>
-            <TabsTrigger value="borrowings">My Borrowings</TabsTrigger>
+          <TabsList className="grid w-full max-w-md mx-auto grid-cols-3 gap-1">
+            <TabsTrigger value="catalog" className="text-sm sm:text-base">Browse Books</TabsTrigger>
+            <TabsTrigger value="borrowings" className="text-sm sm:text-base">Active</TabsTrigger>
+            <TabsTrigger value="history" className="text-sm sm:text-base">History</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="catalog" className="space-y-6">
+          <TabsContent value="catalog" className="space-y-6 animate-fade-in">
             {/* Search Bar */}
-            <Card>
+            <Card className="transition-all hover:shadow-md">
               <CardHeader>
                 <CardTitle>Book Catalog</CardTitle>
                 <CardDescription>Browse and search available books</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="relative">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground transition-colors" />
                   <Input
                     placeholder="Search by title, author, or category..."
-                    className="pl-10"
+                    className="pl-10 transition-all focus:scale-[1.02]"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
@@ -83,8 +84,12 @@ const StudentDashboard = () => {
             <BookCatalog searchQuery={searchQuery} />
           </TabsContent>
 
-          <TabsContent value="borrowings" className="space-y-6">
-            <MyBorrowings />
+          <TabsContent value="borrowings" className="space-y-6 animate-fade-in">
+            <MyBorrowings showActive={true} />
+          </TabsContent>
+
+          <TabsContent value="history" className="space-y-6 animate-fade-in">
+            <MyBorrowings showActive={false} />
           </TabsContent>
         </Tabs>
       </main>
