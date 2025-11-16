@@ -108,8 +108,8 @@ const MyBorrowings = ({ showActive = true }: MyBorrowingsProps) => {
         {requests.map((request, index) => (
           <Card 
             key={request.id}
-            className="transition-all duration-300 hover:shadow-lg hover:scale-[1.01] animate-fade-in"
-            style={{ animationDelay: `${index * 50}ms` }}
+            className="transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover-glow animate-fade-up group"
+            style={{ animationDelay: `${index * 100}ms` }}
           >
             <CardHeader>
               <div className="flex items-start justify-between flex-col sm:flex-row gap-4">
@@ -118,11 +118,11 @@ const MyBorrowings = ({ showActive = true }: MyBorrowingsProps) => {
                     <img
                       src={request.books.photo_url}
                       alt={request.books.title}
-                      className="w-16 h-20 sm:w-20 sm:h-24 object-cover rounded transition-transform hover:scale-105"
+                      className="w-16 h-20 sm:w-20 sm:h-24 object-cover rounded transition-all duration-300 group-hover:scale-110 group-hover:rotate-2 shadow-md group-hover:shadow-xl"
                     />
                   ) : (
-                    <div className="w-16 h-20 sm:w-20 sm:h-24 bg-muted rounded flex items-center justify-center">
-                      <BookOpen className="h-8 w-8 text-muted-foreground" />
+                    <div className="w-16 h-20 sm:w-20 sm:h-24 bg-muted rounded flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+                      <BookOpen className="h-8 w-8 text-muted-foreground transition-transform group-hover:rotate-12" />
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
@@ -135,27 +135,27 @@ const MyBorrowings = ({ showActive = true }: MyBorrowingsProps) => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-                <div className="transition-colors hover:text-primary">
+                <div className="transition-all duration-300 hover:text-primary hover:scale-110 hover:-translate-y-1 p-2 rounded hover:bg-primary/5">
                   <p className="text-muted-foreground text-xs sm:text-sm">Requested</p>
                   <p className="font-medium text-sm sm:text-base">{format(new Date(request.created_at), "PP")}</p>
                 </div>
                 {request.issue_date && (
-                  <div className="transition-colors hover:text-primary">
+                  <div className="transition-all duration-300 hover:text-primary hover:scale-110 hover:-translate-y-1 p-2 rounded hover:bg-primary/5">
                     <p className="text-muted-foreground text-xs sm:text-sm">Issue Date</p>
                     <p className="font-medium text-sm sm:text-base">{format(new Date(request.issue_date), "PP")}</p>
                   </div>
                 )}
                 {request.due_date && (
-                  <div className="transition-colors hover:text-primary">
+                  <div className="transition-all duration-300 hover:text-primary hover:scale-110 hover:-translate-y-1 p-2 rounded hover:bg-primary/5">
                     <p className="text-muted-foreground text-xs sm:text-sm">Due Date</p>
-                    <p className={`font-medium text-sm sm:text-base ${isOverdue(request.due_date) && request.status === "approved" ? "text-destructive animate-pulse" : ""}`}>
+                    <p className={`font-medium text-sm sm:text-base transition-all ${isOverdue(request.due_date) && request.status === "approved" ? "text-destructive animate-pulse scale-110" : ""}`}>
                       {format(new Date(request.due_date), "PP")}
                       {isOverdue(request.due_date) && request.status === "approved" && " (Overdue)"}
                     </p>
                   </div>
                 )}
                 {request.return_date && (
-                  <div className="transition-colors hover:text-primary">
+                  <div className="transition-all duration-300 hover:text-primary hover:scale-110 hover:-translate-y-1 p-2 rounded hover:bg-primary/5">
                     <p className="text-muted-foreground text-xs sm:text-sm">Returned</p>
                     <p className="font-medium text-sm sm:text-base">{format(new Date(request.return_date), "PP")}</p>
                   </div>
@@ -170,9 +170,9 @@ const MyBorrowings = ({ showActive = true }: MyBorrowingsProps) => {
               )}
 
               {request.status === "pending" && showActive && (
-                <div className="mt-4 p-4 bg-primary/5 border border-primary/20 rounded-md animate-fade-in">
+                <div className="mt-4 p-4 bg-primary/5 border border-primary/20 rounded-md animate-bounce-in hover:bg-primary/10 transition-all duration-300">
                   <p className="text-xs sm:text-sm text-primary flex items-center gap-2">
-                    <Clock className="h-4 w-4 animate-spin" />
+                    <Clock className="h-4 w-4 animate-spin drop-shadow-lg" />
                     Your request is being reviewed by the library admin
                   </p>
                 </div>
@@ -183,15 +183,15 @@ const MyBorrowings = ({ showActive = true }: MyBorrowingsProps) => {
       </div>
 
       {requests.length === 0 && (
-        <Card className="animate-fade-in">
+        <Card className="animate-scale-in hover-glow">
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <BookOpen className="h-16 w-16 text-muted-foreground mb-4 transition-transform hover:scale-110" />
-            <p className="text-muted-foreground text-center">
+            <BookOpen className="h-16 w-16 text-muted-foreground mb-4 transition-all duration-500 hover:scale-125 hover:rotate-12 animate-bounce-in" />
+            <p className="text-muted-foreground text-center animate-fade-in">
               {showActive 
                 ? "You don't have any active borrowings" 
                 : "No transaction history yet"}
             </p>
-            <p className="text-sm text-muted-foreground text-center mt-2 max-w-md px-4">
+            <p className="text-sm text-muted-foreground text-center mt-2 max-w-md px-4 animate-fade-in" style={{ animationDelay: "0.2s" }}>
               {showActive 
                 ? "Browse the catalog to find books you'd like to borrow" 
                 : "Your completed and rejected requests will appear here"}

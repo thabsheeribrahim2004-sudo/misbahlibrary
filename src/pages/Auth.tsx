@@ -130,13 +130,13 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
-      <Card className="w-full max-w-xs shadow-lg">
+      <Card className="w-full max-w-xs shadow-lg animate-scale-in hover-glow">
         <CardHeader className="space-y-2 text-center">
-          <div className="flex items-center justify-center mb-2">
-            <BookOpen className="h-12 w-12 text-primary" />
+          <div className="flex items-center justify-center mb-2 animate-bounce-in">
+            <BookOpen className="h-12 w-12 text-primary drop-shadow-lg" />
           </div>
-          <CardTitle className="text-2xl">Misbah Library</CardTitle>
-          <CardDescription>Access your library account</CardDescription>
+          <CardTitle className="text-2xl animate-fade-in">Misbah Library</CardTitle>
+          <CardDescription className="animate-fade-in" style={{ animationDelay: "0.2s" }}>Access your library account</CardDescription>
         </CardHeader>
         
         <Tabs defaultValue="signin" className="w-full">
@@ -189,7 +189,7 @@ const Auth = () => {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button type="submit" className="w-full hover-lift transition-all duration-300" disabled={loading}>
                   {loading ? "Signing in..." : "Sign In"}
                 </Button>
               </CardFooter>
@@ -305,7 +305,7 @@ const Auth = () => {
                 )}
               </CardContent>
               <CardFooter>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button type="submit" className="w-full hover-lift transition-all duration-300" disabled={loading}>
                   {loading ? "Creating account..." : "Sign Up"}
                 </Button>
               </CardFooter>
