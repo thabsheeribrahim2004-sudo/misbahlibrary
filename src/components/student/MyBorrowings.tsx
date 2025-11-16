@@ -23,7 +23,11 @@ interface BorrowRequest {
   };
 }
 
-const MyBorrowings = () => {
+interface MyBorrowingsProps {
+  showActive?: boolean;
+}
+
+const MyBorrowings = ({ showActive = true }: MyBorrowingsProps) => {
   const [requests, setRequests] = useState<BorrowRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
@@ -32,20 +36,28 @@ const MyBorrowings = () => {
     if (user) {
       fetchRequests();
     }
-  }, [user]);
+  }, [user, showActive]);
 
   const fetchRequests = async () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from("borrow_requests")
         .select(`
           *,
           books (title, author, photo_url)
         `)
-        .eq("student_id", user.id)
-        .order("created_at", { ascending: false });
+        .eq("student_id", user.id);
+      
+      // Filter based on showActive prop
+      if (showActive) {
+        query = query.in("status", ["pending", "approved"]);
+      } else {
+        query = query.in("status", ["rejected", "returned"]);
+      }
+      
+      const { data, error } = await query.order("created_at", { ascending: false });
 
       if (error) throw error;
       setRequests(data || []);
@@ -83,76 +95,84 @@ const MyBorrowings = () => {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h2 className="text-2xl font-bold">My Borrowings</h2>
-        <p className="text-muted-foreground">Track your borrowed books and requests</p>
+      <div className="animate-fade-in">
+        <h2 className="text-2xl font-bold">{showActive ? "Active Borrowings" : "Transaction History"}</h2>
+        <p className="text-muted-foreground">
+          {showActive 
+            ? "Track your current borrowed books and pending requests" 
+            : "View your complete borrowing history"}
+        </p>
       </div>
 
       <div className="grid gap-4">
-        {requests.map((request) => (
-          <Card key={request.id}>
+        {requests.map((request, index) => (
+          <Card 
+            key={request.id}
+            className="transition-all duration-300 hover:shadow-lg hover:scale-[1.01] animate-fade-in"
+            style={{ animationDelay: `${index * 50}ms` }}
+          >
             <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex gap-4 flex-1">
+              <div className="flex items-start justify-between flex-col sm:flex-row gap-4">
+                <div className="flex gap-4 flex-1 w-full">
                   {request.books.photo_url ? (
                     <img
                       src={request.books.photo_url}
                       alt={request.books.title}
-                      className="w-16 h-20 object-cover rounded"
+                      className="w-16 h-20 sm:w-20 sm:h-24 object-cover rounded transition-transform hover:scale-105"
                     />
                   ) : (
-                    <div className="w-16 h-20 bg-muted rounded flex items-center justify-center">
+                    <div className="w-16 h-20 sm:w-20 sm:h-24 bg-muted rounded flex items-center justify-center">
                       <BookOpen className="h-8 w-8 text-muted-foreground" />
                     </div>
                   )}
-                  <div className="flex-1">
-                    <CardTitle className="text-lg">{request.books.title}</CardTitle>
-                    <CardDescription className="mt-1">by {request.books.author}</CardDescription>
+                  <div className="flex-1 min-w-0">
+                    <CardTitle className="text-lg break-words">{request.books.title}</CardTitle>
+                    <CardDescription className="mt-1 break-words">by {request.books.author}</CardDescription>
                   </div>
                 </div>
                 {getStatusBadge(request.status)}
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-muted-foreground">Requested</p>
-                  <p className="font-medium">{format(new Date(request.created_at), "PP")}</p>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                <div className="transition-colors hover:text-primary">
+                  <p className="text-muted-foreground text-xs sm:text-sm">Requested</p>
+                  <p className="font-medium text-sm sm:text-base">{format(new Date(request.created_at), "PP")}</p>
                 </div>
                 {request.issue_date && (
-                  <div>
-                    <p className="text-muted-foreground">Issue Date</p>
-                    <p className="font-medium">{format(new Date(request.issue_date), "PP")}</p>
+                  <div className="transition-colors hover:text-primary">
+                    <p className="text-muted-foreground text-xs sm:text-sm">Issue Date</p>
+                    <p className="font-medium text-sm sm:text-base">{format(new Date(request.issue_date), "PP")}</p>
                   </div>
                 )}
                 {request.due_date && (
-                  <div>
-                    <p className="text-muted-foreground">Due Date</p>
-                    <p className={`font-medium ${isOverdue(request.due_date) && request.status === "approved" ? "text-destructive" : ""}`}>
+                  <div className="transition-colors hover:text-primary">
+                    <p className="text-muted-foreground text-xs sm:text-sm">Due Date</p>
+                    <p className={`font-medium text-sm sm:text-base ${isOverdue(request.due_date) && request.status === "approved" ? "text-destructive animate-pulse" : ""}`}>
                       {format(new Date(request.due_date), "PP")}
                       {isOverdue(request.due_date) && request.status === "approved" && " (Overdue)"}
                     </p>
                   </div>
                 )}
                 {request.return_date && (
-                  <div>
-                    <p className="text-muted-foreground">Returned</p>
-                    <p className="font-medium">{format(new Date(request.return_date), "PP")}</p>
+                  <div className="transition-colors hover:text-primary">
+                    <p className="text-muted-foreground text-xs sm:text-sm">Returned</p>
+                    <p className="font-medium text-sm sm:text-base">{format(new Date(request.return_date), "PP")}</p>
                   </div>
                 )}
               </div>
 
               {request.remarks && (
-                <div className="mt-4 p-3 bg-muted rounded-md">
-                  <p className="text-sm text-muted-foreground mb-1">Admin Remarks</p>
-                  <p className="text-sm">{request.remarks}</p>
+                <div className="mt-4 p-3 bg-muted rounded-md transition-all hover:bg-muted/80 animate-fade-in">
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-1">Admin Remarks</p>
+                  <p className="text-sm break-words">{request.remarks}</p>
                 </div>
               )}
 
-              {request.status === "pending" && (
-                <div className="mt-4 p-4 bg-primary/5 border border-primary/20 rounded-md">
-                  <p className="text-sm text-primary flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
+              {request.status === "pending" && showActive && (
+                <div className="mt-4 p-4 bg-primary/5 border border-primary/20 rounded-md animate-fade-in">
+                  <p className="text-xs sm:text-sm text-primary flex items-center gap-2">
+                    <Clock className="h-4 w-4 animate-spin" />
                     Your request is being reviewed by the library admin
                   </p>
                 </div>
@@ -163,14 +183,18 @@ const MyBorrowings = () => {
       </div>
 
       {requests.length === 0 && (
-        <Card>
+        <Card className="animate-fade-in">
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <BookOpen className="h-16 w-16 text-muted-foreground mb-4" />
+            <BookOpen className="h-16 w-16 text-muted-foreground mb-4 transition-transform hover:scale-110" />
             <p className="text-muted-foreground text-center">
-              You haven't borrowed any books yet
+              {showActive 
+                ? "You don't have any active borrowings" 
+                : "No transaction history yet"}
             </p>
-            <p className="text-sm text-muted-foreground text-center mt-2">
-              Browse the catalog to find books you'd like to borrow
+            <p className="text-sm text-muted-foreground text-center mt-2 max-w-md px-4">
+              {showActive 
+                ? "Browse the catalog to find books you'd like to borrow" 
+                : "Your completed and rejected requests will appear here"}
             </p>
           </CardContent>
         </Card>
