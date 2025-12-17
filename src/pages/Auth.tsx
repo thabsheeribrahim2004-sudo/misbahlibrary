@@ -30,6 +30,8 @@ const Auth = () => {
   const navigate = useNavigate();
   const { signIn, signUp, user, userRole } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
+  const [splashPhase, setSplashPhase] = useState<'logo' | 'text' | 'done'>('logo');
 
   // Sign In Form State
   const [signInData, setSignInData] = useState({ email: "", password: "" });
@@ -46,6 +48,19 @@ const Auth = () => {
     year: "",
   });
   const [showSignUpPassword, setShowSignUpPassword] = useState(false);
+
+  // Splash animation sequence
+  useEffect(() => {
+    const logoTimer = setTimeout(() => setSplashPhase('text'), 1000);
+    const textTimer = setTimeout(() => setSplashPhase('done'), 2200);
+    const hideTimer = setTimeout(() => setShowSplash(false), 3000);
+    
+    return () => {
+      clearTimeout(logoTimer);
+      clearTimeout(textTimer);
+      clearTimeout(hideTimer);
+    };
+  }, []);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -127,6 +142,47 @@ const Auth = () => {
       setLoading(false);
     }
   };
+
+  // Splash Screen
+  if (showSplash) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-primary/20 via-background to-accent/20">
+        <div 
+          className={`transition-all duration-700 ease-out ${
+            splashPhase === 'logo' ? 'scale-100 opacity-100' : 'scale-90 opacity-100'
+          }`}
+        >
+          <BookOpen 
+            className={`h-24 w-24 text-primary drop-shadow-2xl transition-all duration-500 ${
+              splashPhase !== 'done' ? 'animate-pulse' : ''
+            }`}
+            style={{
+              filter: 'drop-shadow(0 0 20px hsla(280, 38%, 70%, 0.5))'
+            }}
+          />
+        </div>
+        <h1 
+          className={`text-4xl font-bold text-primary mt-6 transition-all duration-700 ease-out ${
+            splashPhase === 'text' || splashPhase === 'done' 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-4'
+          }`}
+          style={{
+            textShadow: '0 0 30px hsla(280, 38%, 70%, 0.4)'
+          }}
+        >
+          Misbah Library
+        </h1>
+        <div 
+          className={`mt-8 transition-all duration-500 ${
+            splashPhase === 'done' ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
