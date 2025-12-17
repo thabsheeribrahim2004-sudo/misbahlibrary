@@ -156,10 +156,20 @@ export default {
         },
         "glow": {
           "0%, 100%": {
-            boxShadow: "0 0 20px hsla(174, 42%, 51%, 0.4)",
+            boxShadow: "0 0 20px hsla(280, 38%, 70%, 0.4)",
           },
           "50%": {
-            boxShadow: "0 0 30px hsla(174, 42%, 51%, 0.6)",
+            boxShadow: "0 0 30px hsla(280, 38%, 70%, 0.6)",
+          },
+        },
+        "logo-pulse": {
+          "0%, 100%": {
+            transform: "scale(1)",
+            opacity: "1",
+          },
+          "50%": {
+            transform: "scale(1.1)",
+            opacity: "0.9",
           },
         },
       },
