@@ -157,7 +157,7 @@ const Auth = () => {
               splashPhase !== 'done' ? 'animate-pulse' : ''
             }`}
             style={{
-              filter: 'drop-shadow(0 0 20px hsla(280, 38%, 70%, 0.5))'
+              filter: 'drop-shadow(0 0 20px hsla(217, 91%, 55%, 0.5))'
             }}
           />
         </div>
@@ -168,7 +168,7 @@ const Auth = () => {
               : 'opacity-0 translate-y-4'
           }`}
           style={{
-            textShadow: '0 0 30px hsla(280, 38%, 70%, 0.4)'
+            textShadow: '0 0 30px hsla(217, 91%, 55%, 0.4)'
           }}
         >
           Misbah Library
